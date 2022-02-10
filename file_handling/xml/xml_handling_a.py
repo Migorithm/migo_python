@@ -7,7 +7,7 @@ for name in dom.getElementsByTagName('name'):
     print(name.firstChild.data)
 
 print('==============================================')
-datasource = open('../files/myfriend.xml') #파일로 읽어와서 파싱한다.
+datasource = open('../files/xmlfile_name.xml') #파일로 읽어와서 파싱한다.
 dom2 = parse(datasource)
 for name in dom.getElementsByTagName('addr'):
     print(name.firstChild.data)
