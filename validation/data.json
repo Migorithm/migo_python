@@ -1,0 +1,17 @@
+[{
+    "title": "Load of the rings",
+    "author": "RR.Tolkin",
+    "publisher" : "Migo",
+    "price": 3.9,
+    "isbn_10" : "0753555190",
+    "isbn_13": "13N23k3l",
+    "subtitle": "Rings"
+},
+{
+    "title": "Harry Porter",
+    "author": "J.K Rolling",
+    "publisher" : "DK",
+    "price": 4.9,
+    "subtitle": "Thunder",
+    "isbn_10" : "0753555190"
+}]
