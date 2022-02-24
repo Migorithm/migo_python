@@ -14,8 +14,8 @@ class Open_File():
     def __exit__(self,exec_type,exc_val,traceback):
         self.file.close()
 
-with Open_File("sample.txt",'w') as f:
-    f.write("Testing")
+#with Open_File("sample.txt",'w') as f:
+#    f.write("Testing")
 
 
 
@@ -32,10 +32,10 @@ def open_file(file,mode):
     finally:
         f.close()
 
-with open_file("sample2.txt","w") as f:
-    f.write("Lorem ipsum dolor sit amet,")
+#with open_file("sample2.txt","w") as f:
+ #   f.write("Lorem ipsum dolor sit amet,")
 
-print(f.closed)
+#print(f.closed)
 
 
 # But 'open' is already a context manager within python. So now, take a look 
@@ -45,9 +45,16 @@ import os
 @contextmanager
 def change_dir(destination):
     try:
+        if not os.path.exists(destination):
+            os.mkdir(destination)
         cwd = os.getcwd()
         os.chdir(destination)
-        yield                   #It's okay not to put object 
+        yield      # It's okay not to put object 
+                   # All the commands will be executed within this context.         
     finally:
         #Change directory back to original
         os.chdir(cwd)
+        print(os.getcwd())
+
+with change_dir("/Users/we/Downloads/"):
+    print(os.listdir())
