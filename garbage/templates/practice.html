@@ -1,0 +1,47 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<select name="ctg_name" id="ctg_name" onchange="fnGetCtgSub(this.value)">
+    <option value="">Choose</option>
+    <option value="Redis">Redis</option>
+    <option value="Elastic">Elastic</option>
+  
+    
+</select>
+<small style="display:none" id="test"> Hey! </small>
+<select name="ctg_sub_name" id="ctg_sub_name">
+    
+    <option value="">choose</option>
+</select>
+
+<script>
+    function fnGetCtgSub(sParam){
+        var $target = $("select[name='ctg_sub_name']");
+        $target.empty();
+        if (sParam==""){
+            $target.append("<option value=''>choose</option>");
+            $("#test").hide()
+            return;
+        }
+        $.ajax({
+            type: "POST",
+            url : "/practice",
+            headers: {'Content-Type': 'application/json'},
+            data: JSON.stringify({P_NO: sParam}), //value you got
+            dataType: "json",
+            success: function(response){
+                console.log(response);
+                $("#test").show()
+                if ([response["result"]]){
+                    $target.append("<option value=''>choose</option>");
+                    for (let i = 0; i < response["result"].length; i++) {
+                        $target.append("<option value='" +response["result"][i] +"'>"+ response["result"][i] +"</option>")
+                      }
+                  
+                    
+                }
+
+            }
+        })
+    }
+
+</script>
