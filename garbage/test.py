@@ -1,8 +1,8 @@
-from flask import Flask,render_template,jsonify,request
-import random
+from flask import Flask,render_template,jsonify,request,session
+import random ,os,json
 
 app = Flask(__name__)
-
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 random_number = random.random()
 
 @app.route('/update_decimal',methods=["POST"])
@@ -22,19 +22,28 @@ def homepage():
     
     return render_template("home.html",x=random_number)
 
-@app.route('/prac')
+@app.route('/prac',methods=["GET","POST"])
 def index():
+    if request.method=="POST":
+        print(request.get_json())
+        print(request.get_data())
     return render_template("practice.html")
 
 @app.route('/practice',methods=["POST"])
 def whatever():
-
+    info = json.loads(os.getenv("SOLUTION"))
     req= request.get_json()
-    if req["P_NO"] == "Redis":
-        return jsonify({"result":[1,2,3,4,5]})
-    if req["P_NO"] == "Elastic":
-        return jsonify({"result":[1,2,3,4,5]})
+    
+    if req["P_NO"] in info.keys(): 
+        print(info.keys())
+        session["solution"] = req["P_NO"]
+        return jsonify({"result": tuple(info[req["P_NO"]].keys()),"type":"cluster"})
+    if req["P_NO"] in info[session["solution"]]:
+        session["cluster"] = req["P_NO"]
+        print(info[session["solution"]][session["cluster"]])
+        return jsonify({"result":tuple(info[session["solution"]][session["cluster"]]),"type":"nodes"})
     return jsonify({"a":1,"b":3})
 
-app.run(debug=True)
+
+
 

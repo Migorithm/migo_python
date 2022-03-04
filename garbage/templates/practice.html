@@ -1,47 +1,98 @@
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
-<select name="ctg_name" id="ctg_name" onchange="fnGetCtgSub(this.value)">
+
+<select class="form-select" name="ctg_name" id="ctg_name" onchange="fn(this.value,'step')">
     <option value="">Choose</option>
     <option value="Redis">Redis</option>
-    <option value="Elastic">Elastic</option>
-  
+    <option value="ElasticSearch">ElasticSearch</option>
     
 </select>
-<small style="display:none" id="test"> Hey! </small>
-<select name="ctg_sub_name" id="ctg_sub_name">
+<br><br>
+<select class="form-select" name="step" id="step" style="display: none;" onchange="fn(this.value,'step2')">
     
     <option value="">choose</option>
 </select>
 
+<form class="form-check" id="step2" style="display:none;">
+    
+</form>
+
+
+
+
 <script>
-    function fnGetCtgSub(sParam){
-        var $target = $("select[name='ctg_sub_name']");
+
+    var clustername
+
+    function fn(sParam,next){
+        var $target = $("#"+next);
         $target.empty();
         if (sParam==""){
-            $target.append("<option value=''>choose</option>");
-            $("#test").hide()
+            //$target.append("<option value=''>choose</option>");
+            $target.hide()
+            $("#step2").hide()
             return;
         }
         $.ajax({
             type: "POST",
             url : "/practice",
             headers: {'Content-Type': 'application/json'},
-            data: JSON.stringify({P_NO: sParam}), //value you got
+            data: JSON.stringify({P_NO: sParam}), //value you pass to the server
             dataType: "json",
             success: function(response){
+
                 console.log(response);
-                $("#test").show()
+                if (sParam == ""){
+                }
+                
                 if ([response["result"]]){
+                    if (next == "step2"){
+                        clustername=$("#step").val()
+                        for (let i = 0; i < response["result"].length; i++) {
+                            let res = response["result"][i]  
+                            $target.append("<div class=row>")
+                            $target.append("<input class='form-check-input' type='checkbox' name='nodes' value="+res+" checked>")
+                            $target.append(" <label class='form-check-label' style='color: darkgrey;' for="+res+"> "+res+"</label><br>")
+                            $target.append("<div>")
+                            
+                        }
+                        $target.append("<button class='btn btn-primary' type='button' id='unique' style='display: none' onclick='postreq()'>Primary</button>") //submit button
+                    }  
+                    else {
+                    $("#step2").hide()
                     $target.append("<option value=''>choose</option>");
                     for (let i = 0; i < response["result"].length; i++) {
                         $target.append("<option value='" +response["result"][i] +"'>"+ response["result"][i] +"</option>")
                       }
-                  
-                    
+                    }
+
+                    $target.show()
+                }
+
+                if (response["type"] === "nodes"){
+                    $("#unique").show()
+               
                 }
 
             }
         })
+
+    };
+
+    function postreq(){
+        let nodes=[]
+        var checkboxes = document.getElementsByName('nodes');
+        for (var checkbox of checkboxes)
+            {
+                if (checkbox.checked) {
+                    nodes.push(checkbox.value);
+                }
+            }
+        console.log(clustername, nodes)
+
     }
+
 
 </script>
