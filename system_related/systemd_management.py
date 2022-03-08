@@ -7,7 +7,7 @@
 #############################################################################################################
 import os
 import argparse
-from pystemd.systemd1 import Unit
+from pystemd.systemd1 import Unit #1 is not typo..
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-s","--service",required=True)
@@ -55,4 +55,10 @@ def full_example():
                 print(f"{service_name} is inactive! But you're not permitted to spin it up.") 
 
 
-       
+def find_service(service):
+    from pystemd.systemd1 import manager
+    manager = manager.Manager()
+    manager.load()
+    list_of_service= list(filter(lambda x:f"{service}".encode() in x[0] , manager.Manager.ListUnits()))
+
+    
