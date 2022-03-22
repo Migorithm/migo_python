@@ -62,3 +62,29 @@ def find_service(service):
     list_of_service= list(filter(lambda x:f"{service}".encode() in x[0] , manager.Manager.ListUnits()))
 
     
+    
+class AgentUtils:
+    logging.basicConfig(filename="/var/log/vertica-agent/agent.log",level=logging.DEBUG)
+    
+    AGENT_KEY=os.getenv("AGENT_KEY")
+    #Service loading
+    def __new__(cls):
+        return cls
+
+    @classmethod
+    def load_service(cls):
+        from pystemd.systemd1 import Unit,manager
+        mng = manager.Manager()
+        mng.load()
+        regex = re.compile(r"redis.*service|elastic.*service|kafka.*service")
+        services= list(filter(lambda x: regex.match(x[0].decode('utf-8')), mng.Manager.ListUnits()))
+        cls.services={}
+        
+        for service in services:
+            serv = service[0].decode('utf-8')
+            service_name= re.sub(r"[@.]",r"_",serv).upper() 
+            unit=Unit(service[0].decode("utf-8"))
+            unit.load()
+            unit=unit.Unit
+            setattr(AgentUtils,service_name,unit)
+            #Put unit first so you can get the state of unit synchronously.
