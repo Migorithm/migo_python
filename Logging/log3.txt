@@ -1,0 +1,2 @@
+ERROR from log_prac : fatal problem!
+ERROR from <module> : Error!
