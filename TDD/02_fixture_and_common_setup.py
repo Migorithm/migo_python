@@ -18,6 +18,13 @@ from statefile import State
 INITIAL_STATE='{"foo":42,"bar":17}'
 
 class TestState(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        print("setupClass")
+    @classmethod
+    def tearDownClass(cls) -> None:
+        print("teardownClass")
+    
     def setUp(self):
         self.testdir = tempfile.mkdtemp()      #1 
         self.state_file_path = os.path.join(
