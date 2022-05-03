@@ -3,7 +3,6 @@ import requests
 import re
 from typing import List, Optional, Tuple, Union, Mapping,Any
 from contextlib import contextmanager
-from pprint import pprint
 import functools
 import sys
 
@@ -41,9 +40,9 @@ class CustomElasticsearch:
             sock.close()
     
     @classmethod
-    @property
     def get_host_len(cls):
         return len(cls._hosts)
+    
     
     class ExceedNumberOfAttempt(Exception):
         pass
@@ -57,7 +56,7 @@ class CustomElasticsearch:
             
         def __call__(self, *args: Any, **kwargs: Any) -> Any:
             self.counter+=1
-            if self.counter > CustomElasticsearch.get_host_len:
+            if self.counter > CustomElasticsearch.get_host_len():
                 raise CustomElasticsearch.ExceedNumberOfAttempt("No connection available for the given cluster.")
             
             path, body = self.func(*args,**kwargs)
@@ -65,12 +64,14 @@ class CustomElasticsearch:
             with CustomElasticsearch.connector() as con:
                 try :
                     if body:
-                        r: requests.models.Response = con.post(CustomElasticsearch._url + path,json=body,timeout=(2,5))
+                        r: requests.models.Response = con.post(CustomElasticsearch._url + path,json=body,timeout=(2,5),auth=CustomElasticsearch._http_auth)
                         CustomElasticsearch.connection_fail.clear()
+                        self.counter =0
                         return r.json()
                     else:
-                        r: requests.models.Response = con.get(CustomElasticsearch._url + path,json=body,timeout=(2,5))
+                        r: requests.models.Response = con.get(CustomElasticsearch._url + path,json=body,timeout=(2,5),auth=CustomElasticsearch._http_auth)
                         CustomElasticsearch.connection_fail.clear()
+                        self.counter =0
                         return r.json()
                 except requests.exceptions.ConnectionError as c:
                     logging.error(sys.exc_info())
@@ -99,8 +100,10 @@ class CustomElasticsearch:
                 
     @classmethod
     @path_decorator
-    def search(cls,index=None,body=None):
+    def search(cls,index=None,body=None,size=None):
         path = f'/{index}/_search'
+        if size:
+            path += f"?size={size}"
         return path,body
     
     
@@ -110,11 +113,3 @@ class CustomElasticsearch:
         path = f'/_cluster/health'
         return path,None
     
-es = CustomElasticsearch(["http://10.107.11.66:9200"])
-a:dict = es.search("heartbeat-7.16.3-2022.03.15-000001")
-b:dict = es.health()
-pprint(a)
-pprint(b)
-    
-                     
-                    
