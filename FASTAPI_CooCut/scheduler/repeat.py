@@ -2,7 +2,7 @@ from fastapi import FastAPI,Depends
 from sqlalchemy.orm import Session
 from db import get_db,User
 # from fastapi_utils.tasks import repeat_every
-from repeat_scheduler import repeat_every
+from repeat_scheduler_with_arguments import repeat_every
 from random import choice
 from string import ascii_letters
 from pydantic import BaseModel
